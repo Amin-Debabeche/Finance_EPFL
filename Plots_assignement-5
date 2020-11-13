@@ -10,6 +10,13 @@ fig, axs = plt.subplots(4, 3,figsize=(50,50))
 a=0
 b=0
 
+betai = []
+alphai = []
+R_2i = []
+t_testi = []
+observationsi = []
+jenseni = []
+
 for l in range(1, 13):
     
 
@@ -21,7 +28,7 @@ for l in range(1, 13):
     Y_pred = linear_regressor.predict(X)  # make predictions
     axs[a, b].scatter(X, Y)
     axs[a, b].plot(X, Y_pred, color='red', label='regression')
-    axs[a, b].set_title(str(data.columns[l]))
+    axs[a, b].set_title(str(data.columns[l]),fontsize=30)
     
     slope, intercept, r_value, p_value, std_err = stats.linregress(X[:,0],Y[:,0])
     
@@ -31,29 +38,34 @@ for l in range(1, 13):
     df1 = pd.read_html(sm.OLS(Y, X).fit().summary().tables[1].as_html(),header=0,index_col=0)[0]
     df2 = pd.read_html(sm.OLS(Y, X).fit().summary().tables[2].as_html(),header=0,index_col=0)[0]
     
-    cst = str(round(df1.coef[0],2))+'±'+str(round(df1['std err'][0],2)) #constant
+    cst = str(round(df1.coef[0],3))+'±'+str(round(df1['std err'][0],3)) #constant
     alpha = df1.coef[0]
-    slope = str(round(df1.coef[1],2))+'±'+str(round(df1['std err'][1],2)) #slope
+    alphai.append(alpha)
+    slope = str(round(df1.coef[1],3))+'±'+str(round(df1['std err'][1],3)) #slope
     beta = df1.coef[1]
-    t_test = str(round(df1.t[1],2)) #t-test
+    betai.append(beta)
+    t_test = str(round(df1.t[1],3)) #t-test
+    t_testi.append(t_test)
     observations = str(df0.y[4]) #number of observtions
-    R_2 = str(round(df0[df0.columns[-1]].iloc[0],2)) # Adjusted squared
+    observationsi.append(observations)
+    R_2 = str(round(df0[df0.columns[-1]].iloc[0],3)) # Adjusted squared
+    R_2i.append(R_2)
     rf = 0.167/100
-    jensen_alpha = alpha - rf*(1-beta)
-    
+    jensen_alpha = statistics.mean(data.iloc[1:-2, l])-(0.167/100) - bate[l-1]*(statistics.mean(data.iloc[1:-2, 13])-(0.167/100))
+    jenseni.append(jensen_alpha)
     
     axs[a, b].plot([], [], ' ', label="Beta(slope): "+slope)
     axs[a, b].plot([], [], ' ', label="Alpha tilted(intercept): "+cst)
     axs[a, b].plot([], [], ' ', label="T-test: "+t_test)
     axs[a, b].plot([], [], ' ', label="Number of observations: "+observations)
     axs[a, b].plot([], [], ' ', label="Adjusted R^2: "+R_2)
-    axs[a, b].plot([], [], ' ', label="Jensen alpha: "+str(jensen_alpha))   
-    axs[a, b].legend(loc='best')
+    axs[a, b].plot([], [], ' ', label="Jensen alpha: "+str(round(jensen_alpha,4)))   
+    axs[a, b].legend(loc='best', fontsize=20)
 
     slope, intercept, r_value, p_value, std_err = stats.linregress(X[:,0],Y[:,0])
     b = b + 1
     if b == 3:
         a = a + 1
         b = 0
-        
+    
 fig.savefig('full_figure.png')
