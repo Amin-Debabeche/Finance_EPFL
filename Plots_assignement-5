@@ -55,4 +55,5 @@ for l in range(1, 13):
     if b == 3:
         a = a + 1
         b = 0
-   
+        
+fig.savefig('full_figure.png')
